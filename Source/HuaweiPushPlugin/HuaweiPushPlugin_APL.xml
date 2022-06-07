@@ -1,0 +1,186 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root xmlns:android="http://schemas.android.com/apk/res/android">
+  <init>
+    <log text="Huawei Push Initialization"/>
+    <setStringFromProperty result="ConfigFile" ini="Engine" section="/Script/HuaweiPushPlugin.HuaweiPushSettings" property="HuaweiAGCConfig" default="Config/AGC/agconnect-services.json"/>
+  </init>
+
+  <buildscriptGradleAdditions>
+    <log text="Huawei Push Configure HMS Core SDK"/>
+    <insert>
+      repositories {
+      google()
+      jcenter()
+      // Configure the Maven repository address for the HMS Core SDK.
+      maven {url 'https://developer.huawei.com/repo/'}
+      }
+    </insert>
+    <insert>
+      dependencies {
+      // Add the AppGallery Connect plugin configuration. You are advised to use the latest plugin version.
+      classpath 'com.huawei.agconnect:agcp:1.6.0.300'
+      }
+    </insert>
+  </buildscriptGradleAdditions>
+
+  <baseBuildGradleAdditions>
+    <log text="Huawei Push Configure HMS maven repository address"/>
+    <insert>
+      allprojects {
+      repositories {
+      google()
+      jcenter()
+      // Configure the Maven repository address for the HMS Core SDK.
+      maven {url 'https://developer.huawei.com/repo/'}
+      }
+      }
+    </insert>
+  </baseBuildGradleAdditions>
+
+  <buildGradleAdditions>
+    <log text="Huawei Push Configure Push dependencies"/>
+    <insert>
+      dependencies {
+      implementation 'com.huawei.hms:push:6.5.0.300'
+      implementation 'com.google.code.gson:gson:2.9.0'
+      }
+    </insert>
+    <insert>
+      apply plugin: 'com.huawei.agconnect'
+    </insert>
+  </buildGradleAdditions>
+
+  <proguardAdditions>
+    <log text="Huawei Push Configure Obfuscation Scripts"/>
+    <insert>
+      -ignorewarnings
+      -keepattributes *Annotation*
+      -keepattributes Exceptions
+      -keepattributes InnerClasses
+      -keepattributes Signature
+      -keepattributes SourceFile,LineNumberTable
+      -keep class com.huawei.hianalytics.**{*;}
+      -keep class com.huawei.updatesdk.**{*;}
+      -keep class com.huawei.hms.**{*;}
+    </insert>
+  </proguardAdditions>
+
+  <prebuildCopies>
+    <log text="Huawei Push Configure external Java class and AGC json file"/>
+    <copyDir src="$S(PluginDir)/External" dst="$S(BuildDir)/src"/>
+    <copyFile src="$S(PluginDir)/../../../../$S(ConfigFile)" dst="$S(BuildDir)/gradle/app/agconnect-services.json"/>
+    <copyFile src="$S(PluginDir)/../../../../$S(ConfigFile)" dst="$S(BuildDir)/gradle/app/src/debug/agconnect-services.json"/>
+    <copyFile src="$S(PluginDir)/../../../../$S(ConfigFile)" dst="$S(BuildDir)/gradle/app/src/release/agconnect-services.json"/>
+  </prebuildCopies>
+
+  <gameActivityImportAdditions>
+    <log text="Huawei Push Import classes"/>
+    <insert>
+      <![CDATA[
+                import com.huawei.plugin.push.*;
+                import org.json.JSONArray;
+                import org.json.JSONException;
+                import org.json.JSONObject;
+            ]]>
+    </insert>
+  </gameActivityImportAdditions>
+
+  <gameActivityClassAdditions>
+    <log text="Huawei Push Configure Java code"/>
+    <insert>
+      <![CDATA[
+                public void HuaweiPush_Get_Action_Intent_Data() {
+                     HuaweiPushPlugin.getActionIntentData();        
+                }
+
+                public void HuaweiPush_Get_Token() {
+                    HuaweiPushPlugin.getToken();
+                }                
+
+                public void HuaweiPush_Delete_Token() {
+                    HuaweiPushPlugin.deleteToken();
+                }
+
+                public void HuaweiPush_Subscribe(String topic) {
+                     HuaweiPushPlugin.subscribe(topic);
+                }
+
+                public void HuaweiPush_Unsubscribe(String topic) {
+                     HuaweiPushPlugin.unsubscribe(topic);
+                }
+
+                private void HuaweiPush_Set_Auto_Init_Enabled(boolean flag) {
+                    HuaweiPushPlugin.setAutoInitEnabled(flag);
+                }
+
+                //Native C++ functions
+                public native void nativeGetTokenSuccess(String token);
+                public native void nativeOnNewToken(String token);
+                public native void nativeOnMessageReceived(String messageJson);
+                public native void nativeGetActionIntentDataSuccess(String dataJson);
+                public native void nativeSubscribeSuccess();
+                public native void nativeUnSubscribeSuccess();
+                public native void nativeOnException(int errorcode, String action, String message);
+            ]]>
+    </insert>
+  </gameActivityClassAdditions>
+  
+  <gameActivityOnCreateAdditions>
+    <log text="Huawei Push Configure initialize code"/>
+    <insert>
+      <![CDATA[
+                HuaweiPushPlugin.initialize(this, new HuaweiPushListener() {
+                    void getTokenSuccess(String token) {
+                        nativeOnCheckEnvironmentSuccess();        
+                    }
+
+                    void onException(int errorCode, String action, String message) {
+                        nativeOnException(errorCode, action, message);
+                    }
+
+                    void onNewToken(String token) {
+                       nativeOnNewToken(token);
+                    }
+
+                    void onMessageReceived(String messageJson) {
+                        nativeOnMessageReceived(messageJson);   
+                    }
+
+                    void getActionIntentDataSuccess(String dataJson) {
+                       nativeGetActionIntentDataSuccess(dataJson);
+                    }
+
+                    void subscribeSuccess() {
+                        nativeSubscribeSuccess();
+                    }
+                    
+                    void unSubscribeSuccess() {
+                       nativeUnSubscribeSuccess();   
+                    }
+                });
+                
+            ]]>
+    </insert>
+  </gameActivityOnCreateAdditions>
+  
+  <androidManifestUpdates>
+    <log text="Huawei Push Configure AndroidManifest"/>
+    <addElements once="true" tag="manifest">
+      <queries>
+        <intent>
+          <action android:name="com.huawei.hms.core.aidlservice" />
+        </intent>
+      </queries>
+    </addElements>
+    <addElements once="true" tag="application"> 
+        <service
+            android:name="com.huawei.plugin.push.PushPluginService"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="com.huawei.push.action.MESSAGING_EVENT"/>
+            </intent-filter>
+        </service>
+    </addElements>
+  </androidManifestUpdates>
+
+</root>
