@@ -21,12 +21,9 @@ import android.util.Log;
 
 import com.huawei.hms.adapter.internal.AvailableCode;
 import com.huawei.hms.adapter.internal.BaseCode;
-import com.huawei.hms.analytics.core.log.HiLog;
 import com.huawei.hms.common.ApiException;
 import com.huawei.hms.support.api.entity.auth.AuthCode;
 import com.huawei.hms.support.api.entity.core.CommonCode;
-import com.huawei.hms.support.api.entity.hwid.HwIDConstant;
-import com.huawei.plugin.account.HuaweiAccountListener;
 import com.huawei.plugin.push.HuaweiPushListener;
 
 import static com.huawei.plugin.account.utils.Constants.UNKNOWN_ERROR;
@@ -50,7 +47,7 @@ public class ExceptionHandle {
      * @param e The exception returned from the IAP API.
      * @return int
      */
-    public static int handle(Activity activity, String action, Exception e, HuaweiPushListener listener) {
+    public static int handle(Activity activity, int action, Exception e, HuaweiPushListener listener) {
         if (e instanceof ApiException) {
             ApiException apiException = (ApiException) e;
             Log.i(TAG, "returnCode: " + apiException.getStatusCode());

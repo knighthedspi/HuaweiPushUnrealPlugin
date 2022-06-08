@@ -53,31 +53,37 @@ FString jstring2FString(JNIEnv *env, jstring jstr)
 	return ret;
 }
 
-extern "C" void Java_com_epicgames_ue4_GameActivity_nativeSubscribeSuccess(JNIEnv *env, jobject thiz)
+extern "C" void Java_com_epicgames_ue4_GameActivity_nativeOnSubscribeSuccess(JNIEnv *env, jobject thiz)
 {
 	AsyncTask(ENamedThreads::GameThread, [=]()
-	{ huawei::PushJniWrapper::getInstance()->subscribeSuccess() });
+	{ huawei::PushJniWrapper::getInstance()->OnSubscribeSuccess() });
 }
 
-extern "C" void Java_com_epicgames_ue4_GameActivity_nativeUnSubscribeSuccess(JNIEnv *env, jobject thiz)
+extern "C" void Java_com_epicgames_ue4_GameActivity_nativeOnUnSubscribeSuccess(JNIEnv *env, jobject thiz)
 {
 	AsyncTask(ENamedThreads::GameThread, [=]()
-	{ huawei::PushJniWrapper::getInstance()->unSubscribeSuccess() });
+	{ huawei::PushJniWrapper::getInstance()->OnUnSubscribeSuccess() });
 }
 
-extern "C" void Java_com_epicgames_ue4_GameActivity_nativeOnException(JNIEnv *env, jobject thiz, int error, jstring action_, jstring message_)
+extern "C" void Java_com_epicgames_ue4_GameActivity_nativeOnDeleteTokenSuccess(JNIEnv *env, jobject thiz)
+{
+	AsyncTask(ENamedThreads::GameThread, [=]()
+	{ huawei::PushJniWrapper::getInstance()->OnDeleteTokenSuccess() });
+}
+
+extern "C" void Java_com_epicgames_ue4_GameActivity_nativeOnException(JNIEnv *env, jobject thiz, int error, int action_, jstring message_)
 {
 	FString action = jstring2FString(env, action_);
 	FString message = jstring2FString(env, message_);
 	AsyncTask(ENamedThreads::GameThread, [=]()
-	{ huawei::PushJniWrapper::getInstance()->onException(error,action, message); });
+	{ huawei::PushJniWrapper::getInstance()->onException(error, action, message); });
 }
 
-extern "C" void Java_com_epicgames_ue4_GameActivity_nativeGetTokenSuccess(JNIEnv *env, jobject thiz, jstring data_)
+extern "C" void Java_com_epicgames_ue4_GameActivity_nativeOnGetTokenSuccess(JNIEnv *env, jobject thiz, jstring data_)
 {
 	FString token = jstring2FString(env, data_);
 	AsyncTask(ENamedThreads::GameThread, [=]()
-	{ huawei::PushJniWrapper::getInstance()->getTokenSuccess(token); });
+	{ huawei::PushJniWrapper::getInstance()->onGetTokenSuccess(token); });
 }
 
 extern "C" void Java_com_epicgames_ue4_GameActivity_nativeOnNewToken(JNIEnv *env, jobject thiz, jstring data_)
@@ -94,7 +100,7 @@ extern "C" void Java_com_epicgames_ue4_GameActivity_nativeOnMessageReceived(JNIE
 	{ huawei::PushJniWrapper::getInstance()->onMessageReceived(data); });
 }
 
-extern "C" void Java_com_epicgames_ue4_GameActivity_nativeGetActionIntentDataSuccess(JNIEnv *env, jobject thiz, jstring data_)
+extern "C" void Java_com_epicgames_ue4_GameActivity_nativeOnGetActionIntentDataSuccess(JNIEnv *env, jobject thiz, jstring data_)
 {
 	FString data = jstring2FString(env, data_);
 	AsyncTask(ENamedThreads::GameThread, [=]()
@@ -191,7 +197,7 @@ namespace huawei
 		}
 	}
 
-	void PushJniWrapper::subscribe(std::string topic)
+	void PushJniWrapper::subscribe(const string topic)
 	{
 		if (JNIEnv *Env = FAndroidApplication::GetJavaEnv(true))
 		{
@@ -206,7 +212,7 @@ namespace huawei
 		}
 	}
 
-	void PushJniWrapper::unSubscribe(std::string topic)
+	void PushJniWrapper::unSubscribe(const string topic)
 	{
 		if (JNIEnv *Env = FAndroidApplication::GetJavaEnv(true))
 		{
@@ -244,25 +250,34 @@ namespace huawei
 	 * Callbacks
 	 ********************************************/
 
-	void PushJniWrapper::subscribeSuccess()
+	void PushJniWrapper::onSubscribeSuccess()
 	{
 		UE_LOG(HuaweiPush_Native, Log, TEXT("Subscribe Success success"));
 		if (_listener != nullptr)
 		{
-			_listener->SubscribeSuccess();
+			_listener->onSubscribeSuccess();
 		}
 	}
 
-	void PushJniWrapper::unSubscribeSuccess()
+	void PushJniWrapper::onDeleteTokenSuccess()
+	{
+		UE_LOG(HuaweiPush_Native, Log, TEXT("Subscribe Success success"));
+		if (_listener != nullptr)
+		{
+			_listener->onDeleteTokenSuccess();
+		}
+	}
+
+	void PushJniWrapper::onUnSubscribeSuccess()
 	{
 		UE_LOG(HuaweiPush_Native, Log, TEXT("unSubscribe Success success"));
 		if (_listener != nullptr)
 		{
-			_listener->unSubscribeSuccess();
+			_listener->onUnSubscribeSuccess();
 		}
 	}
 
-	void PushJniWrapper::onException(int errorcode, const FString &action, const FString &message)
+	void PushJniWrapper::onException(int errorcode, int action, const FString message)
 	{
 		if (_listener != nullptr)
 		{
@@ -270,15 +285,15 @@ namespace huawei
 		}
 	}
 
-	void PushJniWrapper::getTokenSuccess(const FString &token)
+	void PushJniWrapper::onGetTokenSuccess(const FString token)
 	{
 		if (_listener != nullptr)
 		{
-			_listener->getTokenSuccess(token);
+			_listener->onGetTokenSuccess(token);
 		}
 	}
 
-	void PushJniWrapper::onNewToken(const FString &token)
+	void PushJniWrapper::onNewToken(const FString token)
 	{
 		if (_listener != nullptr)
 		{
@@ -286,7 +301,7 @@ namespace huawei
 		}
 	}
 
-	void PushJniWrapper::onMessageReceived(const FString &messageJson)
+	void PushJniWrapper::onMessageReceived(const FString messageJson)
 	{
 		if (_listener != nullptr)
 		{
@@ -294,11 +309,11 @@ namespace huawei
 		}
 	}
 
-	void PushJniWrapper::getActionIntentDataSuccess(const FString &dataJson)
+	void PushJniWrapper::onGetActionIntentDataSuccess(const FString dataJson)
 	{
 		if (_listener != nullptr)
 		{
-			_listener->getActionIntentDataSuccess(dataJson);
+			_listener->onGetActionIntentDataSuccess(dataJson);
 		}
 	}
 
@@ -351,12 +366,12 @@ namespace huawei
 		UE_LOG(HuaweiPushPlugin_Native, Warning, TEXT("Huawei Push is not supported on this platform\n"));
 	}
 
-	void PushJniWrapper::subscribe(std::string topic)
+	void PushJniWrapper::subscribe(const string topic)
 	{
 		UE_LOG(HuaweiPushPlugin_Native, Warning, TEXT("Huawei Push is not supported on this platform\n"));
 	}
 
-	void PushJniWrapper::unSubscribe(std::string topic)
+	void PushJniWrapper::unSubscribe(const string topic)
 	{
 		UE_LOG(HuaweiPushPlugin_Native, Warning, TEXT("Huawei Push is not supported on this platform\n"));
 	}
@@ -384,37 +399,42 @@ namespace huawei
 	 * Callbacks
 	 ********************************************/
 
-	void PushJniWrapper::getTokenSuccess(const FString &token)
+	void PushJniWrapper::onGetTokenSuccess(const FString token)
 	{
 		UE_LOG(HuaweiPushPlugin_Native, Warning, TEXT("Huawei Push is not supported on this platform\n"));
 	}
 
-	void PushJniWrapper::onException(int errorcode, const FString &action, const FString &message)
+	void PushJniWrapper::onException(int errorcode, int action, const FString message)
 	{
 		UE_LOG(HuaweiPushPlugin_Native, Warning, TEXT("Huawei Push is not supported on this platform\n"));
 	}
 
-	void PushJniWrapper::onNewToken(const FString &token)
+	void PushJniWrapper::onNewToken(const FString token)
 	{
 		UE_LOG(HuaweiPushPlugin_Native, Warning, TEXT("Huawei Push is not supported on this platform\n"));
 	}
 
-	void PushJniWrapper::onMessageReceived(const FString &messageJson)
+	void PushJniWrapper::onMessageReceived(const FString messageJson)
 	{
 		UE_LOG(HuaweiPushPlugin_Native, Warning, TEXT("Huawei Push is not supported on this platform\n"));
 	}
 
-	void PushJniWrapper::getActionIntentDataSuccess(const FString &dataJson)
+	void PushJniWrapper::onGetActionIntentDataSuccess(const FString dataJson)
 	{
 		UE_LOG(HuaweiPushPlugin_Native, Warning, TEXT("Huawei Push is not supported on this platform\n"));
 	}
 
-	void PushJniWrapper::subscribeSuccess()
+	void PushJniWrapper::onSubscribeSuccess()
 	{
 		UE_LOG(HuaweiPushPlugin_Native, Warning, TEXT("Huawei Push is not supported on this platform\n"));
 	}
 
-	void PushJniWrapper::unSubscribeSuccess()
+	void PushJniWrapper::onUnSubscribeSuccess()
+	{
+		UE_LOG(HuaweiPushPlugin_Native, Warning, TEXT("Huawei Push is not supported on this platform\n"));
+	}
+
+	void PushJniWrapper::onDeleteTokenSuccess()
 	{
 		UE_LOG(HuaweiPushPlugin_Native, Warning, TEXT("Huawei Push is not supported on this platform\n"));
 	}

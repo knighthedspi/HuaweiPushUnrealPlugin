@@ -2,18 +2,20 @@ package com.huawei.plugin.push;
 
 public interface HuaweiPushListener {
 
-    void getTokenSuccess(String token);
+    void onGetTokenSuccess(String token);
+
+    void onDeleteTokenSuccess();
 
     void onNewToken(String token);
 
     void onMessageReceived(String messageJson);
 
-    void getActionIntentDataSuccess(String dataJson);
+    void onGetActionIntentDataSuccess(String dataJson);
 
-    void subscribeSuccess();
+    void onSubscribeSuccess();
 
-    void unSubscribeSuccess();
+    void onUnSubscribeSuccess();
 
-    void onException(int errorCode, String action, String message);
+    void onException(int errorCode, int action, String message);
 
 }

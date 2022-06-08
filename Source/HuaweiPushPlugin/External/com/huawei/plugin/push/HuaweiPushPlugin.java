@@ -16,12 +16,17 @@ import com.huawei.hms.common.ApiException;
 import com.huawei.hms.push.HmsMessaging;
 import com.huawei.hms.support.common.ActivityMgr;
 import com.huawei.plugin.push.utils.ExceptionHandle;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.Objects;
 
+import static com.huawei.plugin.push.utils.Constants.DELETE_TOKEN_FAILED;
+import static com.huawei.plugin.push.utils.Constants.GET_TOKEN_FAILED;
+import static com.huawei.plugin.push.utils.Constants.SUBSCRIBE_FAILED;
 import static com.huawei.plugin.push.utils.Constants.UNKNOWN_ERROR;
+import static com.huawei.plugin.push.utils.Constants.UN_SUBSCRIBE_FAILED;
 
 public class HuaweiPushPlugin {
 
@@ -46,7 +51,6 @@ public class HuaweiPushPlugin {
             @Override
             public void run() {
                 try {
-                   
                     // Set tokenScope to HCM.
                     String tokenScope = "HCM";
                     String token = HmsInstanceId.getInstance(mActivity).getToken(APP_ID, tokenScope);
@@ -54,13 +58,13 @@ public class HuaweiPushPlugin {
 
                     // Check whether the token is null.
                     if (!TextUtils.isEmpty(token)) {
-                        mListener.getTokenSuccess(token);
+                        mListener.onGetTokenSuccess(token);
                     } else {
-                        mListener.onException(UNKNOWN_ERROR, "get token failed", "token is null");
+                        mListener.onException(UNKNOWN_ERROR, GET_TOKEN_FAILED, "token is null");
                     }
                 } catch (ApiException e) {
                     Log.e(TAG, "get token failed, " + e);
-                    ExceptionHandle.handle(mActivity, "get token failed", e, mListener);
+                    ExceptionHandle.handle(mActivity, GET_TOKEN_FAILED, e, mListener);
                 }
             }
         }.start();
@@ -77,10 +81,11 @@ public class HuaweiPushPlugin {
 
                     // Delete the token.
                     HmsInstanceId.getInstance(mActivity).deleteToken(APP_ID, tokenScope);
+                    mListener.onDeleteTokenSuccess();
                     Log.i(TAG, "token deleted successfully");
                 } catch (ApiException e) {
                     Log.e(TAG, "deleteToken failed." + e);
-                    ExceptionHandle.handle(mActivity, "deleteToken failed", e, mListener);
+                    ExceptionHandle.handle(mActivity, DELETE_TOKEN_FAILED, e, mListener);
                 }
             }
         }.start();
@@ -118,7 +123,7 @@ public class HuaweiPushPlugin {
                         Log.i(TAG, Objects.requireNonNull(e.getMessage()));
                     }
                 }
-                mListener.getActionIntentDataSuccess(jsonObject.toString());
+                mListener.onGetActionIntentDataSuccess(jsonObject.toString());
             }
         } else {
             Log.i(TAG, "intent is null");
@@ -136,16 +141,16 @@ public class HuaweiPushPlugin {
                             // Obtain the topic subscription result.
                             if (task.isSuccessful()) {
                                 Log.i(TAG, "subscribe topic successfully");
-                                mListener.subscribeSuccess();
+                                mListener.onSubscribeSuccess();
                             } else {
                                 Log.e(TAG, "subscribe topic failed, return value is " + task.getException().getMessage());
-                                ExceptionHandle.handle(mActivity, "subscribe topic failed", task.getException(), mListener);
+                                ExceptionHandle.handle(mActivity, SUBSCRIBE_FAILED, task.getException(), mListener);
                             }
                         }
                     });
         } catch (Exception e) {
             Log.e(TAG, "subscribe failed, catch exception : " + e.getMessage());
-            mListener.onException(UNKNOWN_ERROR, "subscribe failed", e.getMessage());
+            mListener.onException(UNKNOWN_ERROR, SUBSCRIBE_FAILED, e.getMessage());
         }
     }
 
@@ -159,16 +164,16 @@ public class HuaweiPushPlugin {
                             // Obtain the topic unsubscription result.
                             if (task.isSuccessful()) {
                                 Log.i(TAG, "unsubscribe topic successfully");
-                                mListener.unSubscribeSuccess();
+                                mListener.onUnSubscribeSuccess();
                             } else {
                                 Log.e(TAG, "unsubscribe topic failed, return value is " + task.getException().getMessage());
-                                ExceptionHandle.handle(mActivity, "unsubscribe topic failed", task.getException(), mListener);
+                                ExceptionHandle.handle(mActivity, UN_SUBSCRIBE_FAILED, task.getException(), mListener);
                             }
                         }
                     });
         } catch (Exception e) {
             Log.e(TAG, "unsubscribe failed, catch exception : " + e.getMessage());
-            mListener.onException(UNKNOWN_ERROR, "unsubscribe failed", e.getMessage());
+            mListener.onException(UNKNOWN_ERROR, UN_SUBSCRIBE_FAILED, e.getMessage());
         }
     }
 

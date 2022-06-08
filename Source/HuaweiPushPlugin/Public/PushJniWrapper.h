@@ -3,6 +3,7 @@
 #include <string>
 
 DECLARE_LOG_CATEGORY_EXTERN(HuaweiPushPlugin_Native, Log, All);
+using namespace std;
 
 namespace huawei
 {
@@ -20,8 +21,8 @@ namespace huawei
 		void deleteToken();
 		void setAutoInitEnabled(bool isEnable);
 		void getActionIntentData();
-		void subscribe(std::string topic);
-		void unSubscribe(std::string topic);
+		void subscribe(const string topic);
+		void unSubscribe(const string topic);
 
 		// Listener
 		void setListener(PushListener *listener);
@@ -29,13 +30,14 @@ namespace huawei
 		PushListener *getListener();
 
 		// Callbacks
-		void getTokenSuccess(const FString &token);
-		void onNewToken(const FString &token);
-		void onMessageReceived(const FString &messageJson);
-		void getActionIntentDataSuccess(const FString &dataJson);
-		void subscribeSuccess();
-		void unSubscribeSuccess();
-		void onException(int errorcode, const FString &action, const FString &message);
+		void onGetTokenSuccess(const FString token);
+		void onDeleteTokenSuccess();
+		void onNewToken(const FString token);
+		void onMessageReceived(const FString messageJson);
+		void onGetActionIntentDataSuccess(const FString dataJson);
+		void onSubscribeSuccess();
+		void onUnSubscribeSuccess();
+		void onException(int errorcode, int action, const FString message);
 
 	protected:
 		PushListener *_listener;

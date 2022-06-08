@@ -25,12 +25,12 @@ namespace huawei
 		PushJniWrapper::getInstance()->getActionIntentData();
 	}
 
-	void Push::subscribe(const FString &topic)
+	void Push::subscribe(const FString topic)
 	{
 		PushJniWrapper::getInstance()->subscribe(TCHAR_TO_UTF8(*topic));
 	}
 
-	void Push::unSubscribe(const FString &topic)
+	void Push::unSubscribe(const FString topic)
 	{
 		PushJniWrapper::getInstance()->unSubscribe(TCHAR_TO_UTF8(*topic));
 	}

@@ -114,13 +114,15 @@
                 }
 
                 //Native C++ functions
-                public native void nativeGetTokenSuccess(String token);
+                public native void nativeOnGetTokenSuccess(String token);
+                public native void nativeOnDeleteTokenSuccess();
                 public native void nativeOnNewToken(String token);
                 public native void nativeOnMessageReceived(String messageJson);
-                public native void nativeGetActionIntentDataSuccess(String dataJson);
-                public native void nativeSubscribeSuccess();
-                public native void nativeUnSubscribeSuccess();
-                public native void nativeOnException(int errorcode, String action, String message);
+                public native void nativeOnGetActionIntentDataSuccess(String dataJson);
+                public native void nativeOnDeleteTokenSuccess();
+                public native void nativeOnSubscribeSuccess();
+                public native void nativeOnUnSubscribeSuccess();
+                public native void nativeOnException(int errorcode, int action, String message);
             ]]>
     </insert>
   </gameActivityClassAdditions>
@@ -130,11 +132,15 @@
     <insert>
       <![CDATA[
                 HuaweiPushPlugin.initialize(this, new HuaweiPushListener() {
-                    void getTokenSuccess(String token) {
-                        nativeOnCheckEnvironmentSuccess();        
+                    void onGetTokenSuccess(String token) {
+                        nativeOnGetTokenSuccess(token);        
                     }
-
-                    void onException(int errorCode, String action, String message) {
+                    
+                    void onDeleteTokenSuccess() {
+                        nativeDeleteTokenSuccess();        
+                    }
+                    
+                    void onException(int errorCode, int action, String message) {
                         nativeOnException(errorCode, action, message);
                     }
 
@@ -146,16 +152,16 @@
                         nativeOnMessageReceived(messageJson);   
                     }
 
-                    void getActionIntentDataSuccess(String dataJson) {
-                       nativeGetActionIntentDataSuccess(dataJson);
+                    void onGetActionIntentDataSuccess(String dataJson) {
+                       nativeOnGetActionIntentDataSuccess(dataJson);
                     }
 
-                    void subscribeSuccess() {
-                        nativeSubscribeSuccess();
+                    void onSubscribeSuccess() {
+                        nativeOnSubscribeSuccess();
                     }
                     
-                    void unSubscribeSuccess() {
-                       nativeUnSubscribeSuccess();   
+                    void onUnSubscribeSuccess() {
+                       nativeOnUnSubscribeSuccess();   
                     }
                 });
                 

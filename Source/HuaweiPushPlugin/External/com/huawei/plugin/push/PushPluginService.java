@@ -10,6 +10,8 @@ import com.huawei.plugin.push.utils.Constants;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import static com.huawei.plugin.push.utils.Constants.ON_MESSAGE_RECEIVED;
+
 public class PushPluginService extends HmsMessageService {
     private String TAG = "PushPluginService";
 
@@ -38,7 +40,7 @@ public class PushPluginService extends HmsMessageService {
             HuaweiPushPlugin.getPushListener().onMessageReceived(jsonObject2.toString());
         } catch (JSONException e) {
             e.printStackTrace();
-            HuaweiPushPlugin.getPushListener().onException(Constants.UNKNOWN_ERROR, "json error", e.getMessage());
+            HuaweiPushPlugin.getPushListener().onException(Constants.UNKNOWN_ERROR, ON_MESSAGE_RECEIVED, e.getMessage());
         }
 
     }
