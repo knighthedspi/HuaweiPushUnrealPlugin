@@ -43,7 +43,7 @@ void UHuaweiPushBlueprint::subscribe(FString topic, const FOnSubscribeSuccess &o
 
 FOnUnSubscribeSuccess UHuaweiPushBlueprint::_onUnSubscribeSuccess;
 FOnUnSubscribeException UHuaweiPushBlueprint::_onUnSubscribeException;
-void UHuaweiPushBlueprint::subscribe(FString topic, const FOnUnSubscribeSuccess &onSuccess, const FOnUnSubscribeException &onException)
+void UHuaweiPushBlueprint::unSubscribe(FString topic, const FOnUnSubscribeSuccess &onSuccess, const FOnUnSubscribeException &onException)
 {
 	Push::unSubscribe(topic);
 	UHuaweiPushBlueprint::_onUnSubscribeSuccess = onSuccess;
@@ -67,7 +67,7 @@ void UHuaweiPushBlueprint::onException(int errorcode, int action, const FString 
 		UHuaweiPushBlueprint::_onGetTokenException.ExecuteIfBound(message);
 		break;
 	case ON_MESSAGE_RECEIVED:
-		UHuaweiPushBlueprint::_onMessageReceivedException.ExecuteIfBound(message);
+		//UHuaweiPushBlueprint::_onMessageReceivedException.ExecuteIfBound(message);
 	default:
 		break;
 	}
@@ -93,17 +93,17 @@ void UHuaweiPushBlueprint::onGetTokenSuccess(const FString token)
 	UHuaweiPushBlueprint::_onGetTokenSuccess.ExecuteIfBound(token);
 }
 
-void UHuaweiPushBlueprint::onOnNewToken(const FString token)
+void UHuaweiPushBlueprint::onNewToken(const FString token)
 {
-	UHuaweiPushBlueprint::_onOnNewToken.ExecuteIfBound(token);
+	//UHuaweiPushBlueprint::_onNewToken.ExecuteIfBound(token);
 }
 
 void UHuaweiPushBlueprint::onMessageReceived(const FString messageJson)
 {
-	UHuaweiPushBlueprint::_onMessageReceived.ExecuteIfBound(messageJson);
+	//UHuaweiPushBlueprint::_onMessageReceived.ExecuteIfBound(messageJson);
 }
 
 void UHuaweiPushBlueprint::onGetActionIntentDataSuccess(const FString dataJson)
 {
-	UHuaweiPushBlueprint::_onGetActionIntentDataSuccess.ExecuteIfBound(dataJson);
+	//UHuaweiPushBlueprint::_onGetActionIntentDataSuccess.ExecuteIfBound(dataJson);
 }

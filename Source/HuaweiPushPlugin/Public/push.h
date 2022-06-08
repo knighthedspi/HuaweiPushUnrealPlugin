@@ -17,7 +17,7 @@ namespace huawei
 		virtual void onGetActionIntentDataSuccess(const FString dataJson) = 0;
 		virtual void onSubscribeSuccess() = 0;
 		virtual void onUnSubscribeSuccess() = 0;
-		virtual void onException(int errorcode, const FString action, const FString message) = 0;
+		virtual void onException(int errorcode, int action, const FString message) = 0;
 	};
 
 	class Push
