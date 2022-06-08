@@ -30,7 +30,7 @@ DECLARE_DYNAMIC_DELEGATE_OneParam(FOnMessageReceivedException, FString, message)
 
 
 UCLASS()
-class HUAWEIPush_API UHuaweiPushBlueprint : public UBlueprintFunctionLibrary,
+class HUAWEIPUSHPLUGIN_API UHuaweiPushBlueprint : public UBlueprintFunctionLibrary,
 	public huawei::PushListener
 {
 	GENERATED_BODY()
