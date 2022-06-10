@@ -1,6 +1,7 @@
 #include "PushJniWrapper.h"
 #include "HuaweiPushModule.h"
 #include "Async/AsyncWork.h"
+#include "push.h"
 
 using namespace std;
 DEFINE_LOG_CATEGORY(HuaweiPushPlugin_Native);
@@ -9,20 +10,21 @@ DEFINE_LOG_CATEGORY(HuaweiPushPlugin_Native);
 
 #include "Android/AndroidApplication.h"
 #include "Android/AndroidJNI.h"
+#include "Android/AndroidJava.h"
 
 // Initialize JNI context
-#define INIT_JAVA_METHOD(name, signature)
-if (JNIEnv *Env = FAndroidApplication::GetJavaEnv(true))
-{
-	name = FJavaWrapper::FindMethod(Env, FJavaWrapper::GameActivityClassID, #name, signature, false);
-	check(name != NULL);
-}
-else
-{
-	check(0);
-}
+#define INIT_JAVA_METHOD(name, signature) \
+if (JNIEnv *Env = FAndroidApplication::GetJavaEnv()) \
+{ \
+    name = FJavaWrapper::FindMethod(Env, FJavaWrapper::GameActivityClassID, #name, signature, false); \
+    check(name != NULL); \
+} \
+else \
+{ \
+    check(0); \
+} \
 
-#define DECLARE_JAVA_METHOD(name)
+#define DECLARE_JAVA_METHOD(name) \
 static jmethodID name = NULL;
 
 string jstring2string(JNIEnv *env, jstring jstr)
@@ -56,24 +58,23 @@ FString jstring2FString(JNIEnv *env, jstring jstr)
 extern "C" void Java_com_epicgames_ue4_GameActivity_nativeOnSubscribeSuccess(JNIEnv *env, jobject thiz)
 {
 	AsyncTask(ENamedThreads::GameThread, [=]()
-	{ huawei::PushJniWrapper::getInstance()->OnSubscribeSuccess() });
+	{ huawei::PushJniWrapper::getInstance()->onSubscribeSuccess(); });
 }
 
 extern "C" void Java_com_epicgames_ue4_GameActivity_nativeOnUnSubscribeSuccess(JNIEnv *env, jobject thiz)
 {
 	AsyncTask(ENamedThreads::GameThread, [=]()
-	{ huawei::PushJniWrapper::getInstance()->OnUnSubscribeSuccess() });
+	{ huawei::PushJniWrapper::getInstance()->onUnSubscribeSuccess(); });
 }
 
 extern "C" void Java_com_epicgames_ue4_GameActivity_nativeOnDeleteTokenSuccess(JNIEnv *env, jobject thiz)
 {
 	AsyncTask(ENamedThreads::GameThread, [=]()
-	{ huawei::PushJniWrapper::getInstance()->OnDeleteTokenSuccess() });
+	{ huawei::PushJniWrapper::getInstance()->onDeleteTokenSuccess(); });
 }
 
-extern "C" void Java_com_epicgames_ue4_GameActivity_nativeOnException(JNIEnv *env, jobject thiz, int error, int action_, jstring message_)
+extern "C" void Java_com_epicgames_ue4_GameActivity_nativeOnException(JNIEnv *env, jobject thiz, int error, int action, jstring message_)
 {
-	FString action = jstring2FString(env, action_);
 	FString message = jstring2FString(env, message_);
 	AsyncTask(ENamedThreads::GameThread, [=]()
 	{ huawei::PushJniWrapper::getInstance()->onException(error, action, message); });
@@ -113,7 +114,7 @@ namespace huawei
 	DECLARE_JAVA_METHOD(HuaweiPush_Get_Token);
 	DECLARE_JAVA_METHOD(HuaweiPush_Delete_Token);
 	DECLARE_JAVA_METHOD(HuaweiPush_Set_Auto_Init_Enabled);
-	DECLARE_JAVA_METHOD(HuaweiPush_Get_Action_Intent_Data_Success);
+	DECLARE_JAVA_METHOD(HuaweiPush_Get_Action_Intent_Data);
 	DECLARE_JAVA_METHOD(HuaweiPush_Subscribe);
 	DECLARE_JAVA_METHOD(HuaweiPush_Unsubscribe);
 
@@ -147,7 +148,7 @@ namespace huawei
 
 	void PushJniWrapper::getToken()
 	{
-		if (JNIEnv *Env = FAndroidApplication::GetJavaEnv(true))
+		if (JNIEnv *Env = FAndroidApplication::GetJavaEnv())
 		{
 			FJavaWrapper::CallVoidMethod(Env, FJavaWrapper::GameActivityThis, HuaweiPush_Get_Token);
 			UE_LOG(LogAndroid, Warning, TEXT("I found the java method HuaweiPush_Get_Token\n"));
@@ -160,7 +161,7 @@ namespace huawei
 
 	void PushJniWrapper::deleteToken()
 	{
-		if (JNIEnv *Env = FAndroidApplication::GetJavaEnv(true))
+		if (JNIEnv *Env = FAndroidApplication::GetJavaEnv())
 		{
 			FJavaWrapper::CallVoidMethod(Env, FJavaWrapper::GameActivityThis, HuaweiPush_Delete_Token);
 			UE_LOG(LogAndroid, Warning, TEXT("I found the java method HuaweiPush_Delete_Token\n"));
@@ -173,7 +174,7 @@ namespace huawei
 
 	void PushJniWrapper::setAutoInitEnabled(bool isEnable)
 	{
-		if (JNIEnv *Env = FAndroidApplication::GetJavaEnv(true))
+		if (JNIEnv *Env = FAndroidApplication::GetJavaEnv())
 		{
 			FJavaWrapper::CallVoidMethod(Env, FJavaWrapper::GameActivityThis, HuaweiPush_Set_Auto_Init_Enabled, isEnable);
 			UE_LOG(LogAndroid, Warning, TEXT("I found the java method HuaweiPush_Set_Auto_Init_Enabled\n"));
@@ -186,7 +187,7 @@ namespace huawei
 
 	void PushJniWrapper::getActionIntentData()
 	{
-		if (JNIEnv *Env = FAndroidApplication::GetJavaEnv(true))
+		if (JNIEnv *Env = FAndroidApplication::GetJavaEnv())
 		{
 			FJavaWrapper::CallVoidMethod(Env, FJavaWrapper::GameActivityThis, HuaweiPush_Get_Action_Intent_Data);
 			UE_LOG(LogAndroid, Warning, TEXT("I found the java method HuaweiPush_Get_Action_Intent_Data\n"));
@@ -199,7 +200,7 @@ namespace huawei
 
 	void PushJniWrapper::subscribe(const string topic)
 	{
-		if (JNIEnv *Env = FAndroidApplication::GetJavaEnv(true))
+		if (JNIEnv *Env = FAndroidApplication::GetJavaEnv())
 		{
 			jstring topic0 = Env->NewStringUTF(topic.c_str());
 			FJavaWrapper::CallVoidMethod(Env, FJavaWrapper::GameActivityThis, HuaweiPush_Subscribe, topic0);
@@ -214,12 +215,12 @@ namespace huawei
 
 	void PushJniWrapper::unSubscribe(const string topic)
 	{
-		if (JNIEnv *Env = FAndroidApplication::GetJavaEnv(true))
+		if (JNIEnv *Env = FAndroidApplication::GetJavaEnv())
 		{
 			jstring topic0 = Env->NewStringUTF(topic.c_str());
-			FJavaWrapper::CallVoidMethod(Env, FJavaWrapper::GameActivityThis, HuaweiPush_Get_PurchaseRecords, topic0);
+			FJavaWrapper::CallVoidMethod(Env, FJavaWrapper::GameActivityThis, HuaweiPush_Unsubscribe, topic0);
 			Env->DeleteLocalRef(topic0);
-			UE_LOG(LogAndroid, Warning, TEXT("I found the java method HuaweiPush_Get_PurchaseRecords\n"));
+			UE_LOG(LogAndroid, Warning, TEXT("I found the java method HuaweiPush_Unsubscribe\n"));
 		}
 		else
 		{
@@ -252,7 +253,7 @@ namespace huawei
 
 	void PushJniWrapper::onSubscribeSuccess()
 	{
-		UE_LOG(HuaweiPush_Native, Log, TEXT("Subscribe Success success"));
+		UE_LOG(HuaweiPushPlugin_Native, Log, TEXT("Subscribe Success"));
 		if (_listener != nullptr)
 		{
 			_listener->onSubscribeSuccess();
@@ -261,7 +262,7 @@ namespace huawei
 
 	void PushJniWrapper::onDeleteTokenSuccess()
 	{
-		UE_LOG(HuaweiPush_Native, Log, TEXT("Subscribe Success success"));
+		UE_LOG(HuaweiPushPlugin_Native, Log, TEXT("Delete Token Success"));
 		if (_listener != nullptr)
 		{
 			_listener->onDeleteTokenSuccess();
@@ -270,7 +271,7 @@ namespace huawei
 
 	void PushJniWrapper::onUnSubscribeSuccess()
 	{
-		UE_LOG(HuaweiPush_Native, Log, TEXT("unSubscribe Success success"));
+		UE_LOG(HuaweiPushPlugin_Native, Log, TEXT("unSubscribe Success success"));
 		if (_listener != nullptr)
 		{
 			_listener->onUnSubscribeSuccess();

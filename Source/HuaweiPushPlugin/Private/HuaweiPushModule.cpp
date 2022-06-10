@@ -3,7 +3,6 @@
 #include "HuaweiPushSettings.h"
 #include "Core.h"
 #include "Modules/ModuleManager.h"
-#include "Interfaces/IPluginManager.h"
 
 #include "Misc/ConfigCacheIni.h"
 #include "UObject/Package.h"
@@ -17,7 +16,7 @@ class HuaweiPushModule : public IHuaweiPushModule
 	virtual void StartupModule() override
 	{
 		// This code will execute after your module is loaded into memory; the exact timing is specified in the .uplugin file per-module
-		Settings = NewObject<UPrHuaweiPushSettings>(GetTransientPackage(), "HuaweiPushSettings", RF_Standalone);
+		Settings = NewObject<UHuaweiPushSettings>(GetTransientPackage(), "HuaweiPushSettings", RF_Standalone);
 		Settings->AddToRoot();
 		if (ISettingsModule *SettingsModule = FModuleManager::GetModulePtr<ISettingsModule>("Settings"))
 		{
@@ -44,7 +43,7 @@ class HuaweiPushModule : public IHuaweiPushModule
 	}
 
 private:
-	UPrHuaweiPushSettings *Settings;
+	UHuaweiPushSettings *Settings;
 };
 
 IMPLEMENT_MODULE(HuaweiPushModule, HuaweiPushPlugin)

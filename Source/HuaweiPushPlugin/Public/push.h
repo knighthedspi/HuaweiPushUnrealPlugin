@@ -10,6 +10,7 @@ namespace huawei
 
 	class PushListener
 	{
+	public:
 		virtual void onGetTokenSuccess(const FString token) = 0;
 		virtual void onDeleteTokenSuccess() = 0;
 		virtual void onNewToken(const FString token) = 0;

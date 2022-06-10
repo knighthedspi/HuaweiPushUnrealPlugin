@@ -3,7 +3,7 @@
 #include "HuaweiPushSettings.generated.h"
 
 UCLASS(config = Engine, defaultconfig)
-class UPrHuaweiPushSettings : public UObject
+class UHuaweiPushSettings : public UObject
 {
 	GENERATED_UCLASS_BODY()
 
