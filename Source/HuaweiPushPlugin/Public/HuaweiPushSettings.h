@@ -10,5 +10,5 @@ class UHuaweiPushSettings : public UObject
 public:
 	/* Path to agconnect-services.json */
 	UPROPERTY(Config, EditAnywhere, Category = "HuaweiPush")
-		FString HuaweiAGCConfig;
+	FString HuaweiAGCConfig;
 };

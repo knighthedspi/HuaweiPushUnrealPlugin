@@ -4,6 +4,10 @@
 
 namespace huawei
 {
+	void Push::init()
+	{
+		PushJniWrapper::getInstance()->init();
+	}
 
 	void Push::getToken()
 	{
@@ -18,11 +22,6 @@ namespace huawei
 	void Push::setAutoInitEnabled(bool isEnable)
 	{
 		PushJniWrapper::getInstance()->setAutoInitEnabled(isEnable);
-	}
-
-	void Push::getActionIntentData()
-	{
-		PushJniWrapper::getInstance()->getActionIntentData();
 	}
 
 	void Push::subscribe(const FString topic)

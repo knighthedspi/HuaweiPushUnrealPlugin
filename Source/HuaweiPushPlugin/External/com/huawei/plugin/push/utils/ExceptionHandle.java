@@ -26,7 +26,7 @@ import com.huawei.hms.support.api.entity.auth.AuthCode;
 import com.huawei.hms.support.api.entity.core.CommonCode;
 import com.huawei.plugin.push.HuaweiPushListener;
 
-import static com.huawei.plugin.account.utils.Constants.UNKNOWN_ERROR;
+import static com.huawei.plugin.push.utils.Constants.UNKNOWN_ERROR;
 
 /**
  *  Handles the exception returned from the iap api.

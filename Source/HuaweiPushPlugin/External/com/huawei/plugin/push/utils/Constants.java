@@ -19,10 +19,10 @@ package com.huawei.plugin.push.utils;
 
 public class Constants {
     public static final int UNKNOWN_ERROR = 100000;
+    public static final int INIT_FAILED = 99;
     public static final int UN_SUBSCRIBE_FAILED = 100;
     public static final int SUBSCRIBE_FAILED = 101;
     public static final int DELETE_TOKEN_FAILED = 102;
     public static final int GET_TOKEN_FAILED = 103;
     public static final int ON_MESSAGE_RECEIVED = 104;
-
 }
