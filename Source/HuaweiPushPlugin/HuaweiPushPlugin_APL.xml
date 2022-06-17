@@ -11,14 +11,14 @@
       repositories {
       google()
       jcenter()
-      // Configure the Maven repository address for the HMS Core SDK.
-      maven {url 'https://developer.huawei.com/repo/'}
+        // Configure the Maven repository address for the HMS Core SDK.
+        maven {url 'https://developer.huawei.com/repo/'}
       }
     </insert>
     <insert>
       dependencies {
-      // Add the AppGallery Connect plugin configuration. You are advised to use the latest plugin version.
-      classpath 'com.huawei.agconnect:agcp:1.6.0.300'
+        // Add the AppGallery Connect plugin configuration. You are advised to use the latest plugin version.
+        classpath 'com.huawei.agconnect:agcp:1.6.0.300'
       }
     </insert>
   </buildscriptGradleAdditions>
@@ -27,12 +27,12 @@
     <log text="Huawei Push Configure HMS maven repository address"/>
     <insert>
       allprojects {
-      repositories {
-      google()
-      jcenter()
-      // Configure the Maven repository address for the HMS Core SDK.
-      maven {url 'https://developer.huawei.com/repo/'}
-      }
+        repositories {
+          google()
+          jcenter()
+          // Configure the Maven repository address for the HMS Core SDK.
+          maven {url 'https://developer.huawei.com/repo/'}
+        }
       }
     </insert>
   </baseBuildGradleAdditions>
@@ -41,8 +41,7 @@
     <log text="Huawei Push Configure Push dependencies"/>
     <insert>
       dependencies {
-      implementation 'com.huawei.hms:push:6.5.0.300'
-      implementation 'com.google.code.gson:gson:2.9.0'
+        implementation 'com.huawei.hms:push:6.5.0.300'
       }
     </insert>
     <insert>
@@ -78,9 +77,6 @@
     <insert>
       <![CDATA[
                 import com.huawei.plugin.push.*;
-                import org.json.JSONArray;
-                import org.json.JSONException;
-                import org.json.JSONObject;
             ]]>
     </insert>
   </gameActivityImportAdditions>
@@ -89,40 +85,27 @@
     <log text="Huawei Push Configure Java code"/>
     <insert>
       <![CDATA[
-                public void HuaweiPush_Get_Action_Intent_Data() {
-                     HuaweiPushPlugin.getActionIntentData();        
-                }
+                private HuaweiPushPlugin mPushPlugin;
 
                 public void HuaweiPush_Get_Token() {
-                    HuaweiPushPlugin.getToken();
+                    mPushPlugin.getToken();
                 }                
 
                 public void HuaweiPush_Delete_Token() {
-                    HuaweiPushPlugin.deleteToken();
+                    mPushPlugin.deleteToken();
                 }
 
                 public void HuaweiPush_Subscribe(String topic) {
-                     HuaweiPushPlugin.subscribe(topic);
+                    mPushPlugin.subscribe(topic);
                 }
 
                 public void HuaweiPush_Unsubscribe(String topic) {
-                     HuaweiPushPlugin.unsubscribe(topic);
+                    mPushPlugin.unsubscribe(topic);
                 }
 
-                private void HuaweiPush_Set_Auto_Init_Enabled(boolean flag) {
-                    HuaweiPushPlugin.setAutoInitEnabled(flag);
+                public void HuaweiPush_Set_Auto_Init_Enabled(boolean flag) {
+                    mPushPlugin.setAutoInitEnabled(flag);
                 }
-
-                //Native C++ functions
-                public native void nativeOnGetTokenSuccess(String token);
-                public native void nativeOnDeleteTokenSuccess();
-                public native void nativeOnNewToken(String token);
-                public native void nativeOnMessageReceived(String messageJson);
-                public native void nativeOnGetActionIntentDataSuccess(String dataJson);
-                public native void nativeOnDeleteTokenSuccess();
-                public native void nativeOnSubscribeSuccess();
-                public native void nativeOnUnSubscribeSuccess();
-                public native void nativeOnException(int errorcode, int action, String message);
             ]]>
     </insert>
   </gameActivityClassAdditions>
@@ -131,40 +114,7 @@
     <log text="Huawei Push Configure initialize code"/>
     <insert>
       <![CDATA[
-                HuaweiPushPlugin.initialize(this, new HuaweiPushListener() {
-                    void onGetTokenSuccess(String token) {
-                        nativeOnGetTokenSuccess(token);        
-                    }
-                    
-                    void onDeleteTokenSuccess() {
-                        nativeDeleteTokenSuccess();        
-                    }
-                    
-                    void onException(int errorCode, int action, String message) {
-                        nativeOnException(errorCode, action, message);
-                    }
-
-                    void onNewToken(String token) {
-                       nativeOnNewToken(token);
-                    }
-
-                    void onMessageReceived(String messageJson) {
-                        nativeOnMessageReceived(messageJson);   
-                    }
-
-                    void onGetActionIntentDataSuccess(String dataJson) {
-                       nativeOnGetActionIntentDataSuccess(dataJson);
-                    }
-
-                    void onSubscribeSuccess() {
-                        nativeOnSubscribeSuccess();
-                    }
-                    
-                    void onUnSubscribeSuccess() {
-                       nativeOnUnSubscribeSuccess();   
-                    }
-                });
-                
+                mPushPlugin = new HuaweiPushPlugin(this);
             ]]>
     </insert>
   </gameActivityOnCreateAdditions>
