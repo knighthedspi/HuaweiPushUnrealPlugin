@@ -115,7 +115,7 @@ According to [HMS integration process introduction](https://developer.huawei.com
    - Find your app project and click the app that needs to integrate the HMS Core SDK.
    - Go to **Project settings > General information**. In the App information area, download the `agconnect-services.json` file.
    ![Screenshots/agc_json.png](Screenshots/agc_json.png)
-   - You can put the json file under `<unreal_project_directory>/Configs/AGC` as default or in your own favorite path
+   - You can put the json file under `<unreal_project_directory>/Configs/AGC` as default (create the `Configs/AGC` directory if not existed) or in your own favorite path
    - In your Unreal Editor, select **Edit -> Project Settings -> Plugins -> HuaweiPush** then set up the `agconnect-services.json` file path.
    ![Screenshots/unreal-step4.png](Screenshots/unreal_step4.png)
 
@@ -124,19 +124,85 @@ According to [HMS integration process introduction](https://developer.huawei.com
 
 ### Developing
 
+#### Using Blueprint
+- In your Unreal Editor, add **Huawei Push** actor component to an actor in your scene
+ ![Screenshots/blueprint_addcomponent.png](Screenshots/blueprint_addcomponent.png)
+- Open **Event Graph** tab in Blueprint editor then locate **Init**, **Set token**,... functions under **HuaweiPush Category**
+- Open **Details** tab of the **Push** component and set up event handlers
+- You can refer to the [Blueprint sample](Blueprint/HuaweiPush_Blueprint.uasset).
+![Screenshots/blueprint.png](Screenshots/blueprint.png)
+
+#### Using C++ APIs
+
 Access the Huawei Push API by including the header file `Push.h` in the related classes of your project.
 
-```
+```C++
 #include "push.h"
+```
+
+- Init
+
+```C++
+huawei::Push::init();
+```
+
+- Get token
+
+```C++
+huawei::Push::getToken();
+```
+
+- Delete token
+
+```C++
+huawei::Push::deleteToken();
+```
+
+- Set auto init enabled
+
+```C++
+huawei::Push::setAutoInitEnabled(true);
+```
+
+- Subscribe to topic
+
+```C++
+huawei::Push::subscribe("topic1");
+```
+
+- Unsubscribe to topic
+
+```C++
+huawei::Push::unSubscribe("topic1");
+```
+
+- Listen to callback events
+Implement a listener class to receive information in all the IAP callback events
+
+Sample code
+Header file
+```C++
+class YourPushListener : public huawei::PushListener {
+public:
+    YourIapListener();
+    
+    void onGetTokenSuccess(const FString token) override;
+    void onDeleteTokenSuccess() override;
+    void onNewToken(const FString token) override;
+    void onMessageReceived(const FString messageJson) override;
+    void onSubscribeSuccess() override;
+    void onUnSubscribeSuccess() override;
+    void onException(int errorcode, int action, const FString message) override;
+}  
 ```
 
 Then set it with the `setListener` API
 
-```
+```C++
 huawei::Push::setListener(new YourPushListener());
 ```
 
-You can refer to Huawei documation for the [ProductInfo](https://developer.huawei.com/consumer/en/doc/development/HMSCore-References/productinfo-0000001050135784) and [InAppPurchaseData](https://developer.huawei.com/consumer/en/doc/development/HMSCore-References/inapppurchasedata-0000001050137635).
+You can refer to Huawei documation for the [Message data](https://developer.huawei.com/consumer/en/doc/development/HMSCore-References/remotemessage-0000001050171874#section18999122470)
 
 
 ### Test & Release
