@@ -60,15 +60,7 @@ Create an app by referring to [Creating a Project](https://developer.huawei.com/
 ![Screenshots/Step2.png](Screenshots/Step2.png)
 ![Screenshots/Preparation.png](Screenshots/Preparation.png)
 
-Now you have your Huawei HMS Project and App information. Next, you need to enable Push service and configure the Push Parameters
-
-1. Enabling Push
-    
-    To use Push, [enable this service](https://developer.huawei.com/consumer/en/doc/distribution/app/agc-help-enabling-service-0000001146598793#EN-US_TOPIC_0000001146598793__en-us_topic_0000001064950324_section135355454314) first.
-
-2. Setting Push Parameters
-
-    To use the HUAWEI in-app payment function, you need to [set Push Parameters](https://developer.huawei.com/consumer/en/doc/development/HMSCore-Guides/config-agc-0000001050033072).
+Now you have your Huawei HMS Project and App information. Next, you need to [enable Push service](https://developer.huawei.com/consumer/en/doc/development/HMSCore-Guides/android-config-agc-0000001050170137)
 
 ### Prepare for development
 
