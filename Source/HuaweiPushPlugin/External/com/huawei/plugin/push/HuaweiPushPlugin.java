@@ -235,7 +235,7 @@ public class HuaweiPushPlugin implements HuaweiPushListener {
 
     @Override
     public void onUnSubscribeSuccess() {
-        nativeOnSubscribeSuccess();
+        nativeOnUnSubscribeSuccess();
     }
 
     @Override
